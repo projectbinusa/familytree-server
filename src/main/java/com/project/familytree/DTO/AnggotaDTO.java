@@ -4,9 +4,9 @@ public class AnggotaDTO {
     private Long id;
     private String nama;
     private String gender;
-    private String hubungan;
     private String tanggalLahir;
     private String fotoAnggota;
+    private Long idAnggota;
     private Long idAdmin;
 
     public Long getId() {
@@ -33,14 +33,6 @@ public class AnggotaDTO {
         this.gender = gender;
     }
 
-    public String getHubungan() {
-        return hubungan;
-    }
-
-    public void setHubungan(String hubungan) {
-        this.hubungan = hubungan;
-    }
-
     public String getTanggalLahir() {
         return tanggalLahir;
     }
@@ -55,6 +47,14 @@ public class AnggotaDTO {
 
     public void setFotoAnggota(String fotoAnggota) {
         this.fotoAnggota = fotoAnggota;
+    }
+
+    public Long getIdAnggota() {
+        return idAnggota;
+    }
+
+    public void setIdAnggota(Long idAnggota) {
+        this.idAnggota = idAnggota;
     }
 
     public Long getIdAdmin() {
