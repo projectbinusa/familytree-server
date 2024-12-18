@@ -1,11 +1,12 @@
 package com.project.familytree.controller;
 
+import com.project.familytree.DTO.AnggotaDTO;
+import com.project.familytree.exception.NotFoundException;
 import com.project.familytree.model.Anggota;
 import com.project.familytree.service.AnggotaService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,19 +36,31 @@ public class AnggotaController {
     }
 
     @GetMapping("/anggota/getById/{id}")
-    public ResponseEntity<Anggota> getAnggotaById(@PathVariable Long id) {
+    public ResponseEntity<AnggotaDTO> getAnggotaById(@PathVariable Long id) {
         Optional<Anggota> anggota = anggotaService.getAnggotaById(id);
-        return anggota.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return anggota.map(anggotaEntity -> {
+            AnggotaDTO anggotaDTO = new AnggotaDTO();
+            anggotaDTO.setId(anggotaEntity.getId());
+            anggotaDTO.setNama(anggotaEntity.getNama());
+            anggotaDTO.setGender(anggotaEntity.getGender());
+            anggotaDTO.setTanggalLahir(anggotaEntity.getTanggalLahir());
+            anggotaDTO.setIdAnggota(anggotaEntity.getIdAnggota() != null ? anggotaEntity.getIdAnggota().getId() : null);
+            anggotaDTO.setIdAdmin(anggotaEntity.getAdmin().getId());
+            return ResponseEntity.ok(anggotaDTO);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 
     @PostMapping("/anggota/tambahByIdAdmin/{idAdmin}")
-    public ResponseEntity<Anggota> tambahAnggota(
+    public ResponseEntity<AnggotaDTO> tambahAnggota(
             @PathVariable Long idAdmin,
-            @RequestBody Anggota anggota) {
+            @RequestBody AnggotaDTO anggotaDTO) {
 
-        Anggota savedAnggota = anggotaService.tambahAnggota(idAdmin, anggota);
+        AnggotaDTO savedAnggota = anggotaService.tambahAnggotaDTO(idAdmin, anggotaDTO);
         return ResponseEntity.ok(savedAnggota);
     }
+
+
 
 //    @PostMapping(value = "/anggota/uploadFoto/{idAdmin}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 //    public ResponseEntity<Void> uploadFotoAnggota(
@@ -59,16 +72,16 @@ public class AnggotaController {
 //        return ResponseEntity.ok().build();
 //    }
 
-    @PutMapping(value = "/anggota/editById/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Anggota> editAnggota(
+    @PutMapping(value = "/anggota/editById/{id}")
+    public ResponseEntity<AnggotaDTO> editAnggota(
             @PathVariable Long id,
             @RequestParam Long idAdmin,
-            @RequestPart(value = "anggota") Anggota anggota,
-            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+            @RequestPart(value = "anggota") AnggotaDTO anggotaDTO) throws IOException {
 
-        Anggota updatedAnggota = anggotaService.editById(id, idAdmin, anggota, image);
+        AnggotaDTO updatedAnggota = anggotaService.editAnggotaDTO(id, idAdmin, anggotaDTO);
         return ResponseEntity.ok(updatedAnggota);
     }
+
 
     @DeleteMapping("/anggota/delete/{id}")
     public ResponseEntity<Void> deleteAnggota(@PathVariable Long id) throws IOException {

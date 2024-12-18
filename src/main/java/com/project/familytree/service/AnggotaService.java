@@ -1,5 +1,6 @@
 package com.project.familytree.service;
 
+import com.project.familytree.DTO.AnggotaDTO;
 import com.project.familytree.model.Anggota;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,11 +16,11 @@ public interface AnggotaService {
 
     Optional<Anggota> getAnggotaById(Long id);
 
-    Anggota tambahAnggota(Long idAdmin, Anggota anggota);
+    AnggotaDTO tambahAnggotaDTO(Long idAdmin, AnggotaDTO anggotaDTO);
 
+    AnggotaDTO editAnggotaDTO(Long id, Long idAdmin, AnggotaDTO anggotaDTO) throws IOException;
+;
 //    void uploadFotoAnggota(Long idAdmin, Long anggotaId, MultipartFile image) throws IOException;
-
-    Anggota editById(Long id, Long idAdmin, Anggota anggota, MultipartFile image) throws IOException;
 
     void deleteAnggota(Long id) throws IOException;
 }

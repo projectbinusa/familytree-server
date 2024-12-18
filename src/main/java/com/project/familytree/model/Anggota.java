@@ -17,14 +17,15 @@ public class Anggota {
     @Column(name = "gender")
     private String gender;
 
-    @Column(name = "hubungan")
-    private String hubungan;
-
     @Column(name = "tanggal_lahir")
     private String tanggalLahir;
 
     @Column(name = "foto_anggota")
     private String fotoAnggota;
+
+    @ManyToOne
+    @JoinColumn(name = "id_anggota", nullable = true)
+    private Anggota idAnggota;
 
     @ManyToOne
     @JoinColumn(name = "id_admin", nullable = false)
@@ -33,13 +34,13 @@ public class Anggota {
     public Anggota() {
     }
 
-    public Anggota(Long id, String nama, String gender, String hubungan, String tanggalLahir, String fotoAnggota, Admin admin) {
+    public Anggota(Long id, String nama, String gender, String tanggalLahir, String fotoAnggota, Anggota idAnggota, Admin admin) {
         this.id = id;
         this.nama = nama;
         this.gender = gender;
-        this.hubungan = hubungan;
         this.tanggalLahir = tanggalLahir;
         this.fotoAnggota = fotoAnggota;
+        this.idAnggota = idAnggota;
         this.admin = admin;
     }
 
@@ -68,12 +69,12 @@ public class Anggota {
         this.gender = gender;
     }
 
-    public String getHubungan() {
-        return hubungan;
+    public Anggota getIdAnggota() {
+        return idAnggota;
     }
 
-    public void setHubungan(String hubungan) {
-        this.hubungan = hubungan;
+    public void setIdAnggota(Anggota idAnggota) {
+        this.idAnggota = idAnggota;
     }
 
     public String getTanggalLahir() {

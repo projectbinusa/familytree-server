@@ -1,5 +1,6 @@
 package com.project.familytree.impl;
 
+import com.project.familytree.DTO.AnggotaDTO;
 import com.project.familytree.exception.NotFoundException;
 import com.project.familytree.model.Admin;
 import com.project.familytree.model.Anggota;
@@ -44,13 +45,40 @@ public class AnggotaImpl implements AnggotaService {
     }
 
     @Override
-    public Anggota tambahAnggota(Long idAdmin, Anggota anggota) {
+    public AnggotaDTO tambahAnggotaDTO(Long idAdmin, AnggotaDTO anggotaDTO) {
         Admin admin = adminRepository.findById(idAdmin)
                 .orElseThrow(() -> new NotFoundException("Id Admin tidak ditemukan"));
 
+        Anggota anggota = new Anggota();
+        anggota.setNama(anggotaDTO.getNama());
+        anggota.setGender(anggotaDTO.getGender());
+        anggota.setTanggalLahir(anggotaDTO.getTanggalLahir());
         anggota.setAdmin(admin);
-        return anggotaRepository.save(anggota);
+
+        if (anggotaDTO.getIdAnggota() != null) {
+            Anggota parentAnggota = anggotaRepository.findById(anggotaDTO.getIdAnggota())
+                    .orElseThrow(() -> new NotFoundException("Id Anggota tidak ditemukan"));
+            anggota.setIdAnggota(parentAnggota);
+        } else {
+            anggota.setIdAnggota(null);
+        }
+
+        Anggota savedAnggota = anggotaRepository.save(anggota);
+
+        // Konversi ke DTO
+        AnggotaDTO result = new AnggotaDTO();
+        result.setId(savedAnggota.getId());
+        result.setNama(savedAnggota.getNama());
+        result.setGender(savedAnggota.getGender());
+        result.setTanggalLahir(savedAnggota.getTanggalLahir());
+        result.setIdAdmin(idAdmin);
+        if (savedAnggota.getIdAnggota() != null) {
+            result.setIdAnggota(savedAnggota.getIdAnggota().getId());  // Mengambil ID anggota parent
+        }
+
+        return result;
     }
+
 
 //    @Override
 //    public void uploadFotoAnggota(Long idAdmin, Long anggotaId, MultipartFile image) throws IOException {
@@ -78,17 +106,44 @@ public class AnggotaImpl implements AnggotaService {
 //    }
 
     @Override
-    public Anggota editById(Long id, Long idAdmin, Anggota anggota, MultipartFile image) throws IOException {
+    public AnggotaDTO editAnggotaDTO(Long id, Long idAdmin, AnggotaDTO anggotaDTO) throws IOException {
         Anggota existingAnggota = anggotaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Anggota tidak ditemukan"));
 
-        existingAnggota.setNama(anggota.getNama());
-        existingAnggota.setGender(anggota.getGender());
-        existingAnggota.setHubungan(anggota.getHubungan());
-        existingAnggota.setTanggalLahir(anggota.getTanggalLahir());
+        Admin admin = adminRepository.findById(idAdmin)
+                .orElseThrow(() -> new NotFoundException("Id Admin tidak ditemukan"));
 
-        return anggotaRepository.save(existingAnggota);
+        existingAnggota.setNama(anggotaDTO.getNama());
+        existingAnggota.setGender(anggotaDTO.getGender());
+        existingAnggota.setTanggalLahir(anggotaDTO.getTanggalLahir());
+        existingAnggota.setAdmin(admin);
+
+        if (anggotaDTO.getIdAnggota() != null) {
+            Anggota parentAnggota = anggotaRepository.findById(anggotaDTO.getIdAnggota())
+                    .orElseThrow(() -> new NotFoundException("Id Anggota tidak ditemukan"));
+            existingAnggota.setIdAnggota(parentAnggota);
+        } else {
+            existingAnggota.setIdAnggota(null);
+        }
+
+        // Simpan perubahan
+        Anggota updatedAnggota = anggotaRepository.save(existingAnggota);
+
+        // Konversi ke DTO
+        AnggotaDTO result = new AnggotaDTO();
+        result.setId(updatedAnggota.getId());
+        result.setNama(updatedAnggota.getNama());
+        result.setGender(updatedAnggota.getGender());
+        result.setTanggalLahir(updatedAnggota.getTanggalLahir());
+        result.setIdAdmin(idAdmin);
+        if (updatedAnggota.getIdAnggota() != null) {
+            result.setIdAnggota(updatedAnggota.getIdAnggota().getId());  // Mengambil ID anggota parent
+        }
+
+        return result;
     }
+
+
 
     @Override
     public void deleteAnggota(Long id) throws IOException {
