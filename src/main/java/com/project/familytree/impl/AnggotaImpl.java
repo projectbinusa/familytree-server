@@ -4,8 +4,10 @@ import com.project.familytree.DTO.AnggotaDTO;
 import com.project.familytree.exception.NotFoundException;
 import com.project.familytree.model.Admin;
 import com.project.familytree.model.Anggota;
+import com.project.familytree.model.Judul;
 import com.project.familytree.repository.AnggotaRepository;
 import com.project.familytree.repository.AdminRepository;
+import com.project.familytree.repository.JudulRepository;
 import com.project.familytree.service.AnggotaService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,10 +25,12 @@ public class AnggotaImpl implements AnggotaService {
 
     private final AnggotaRepository anggotaRepository;
     private final AdminRepository adminRepository;
+    private final JudulRepository judulRepository;
 
-    public AnggotaImpl(AnggotaRepository anggotaRepository, AdminRepository adminRepository) {
+    public AnggotaImpl(AnggotaRepository anggotaRepository, AdminRepository adminRepository, JudulRepository judulRepository) {
         this.anggotaRepository = anggotaRepository;
         this.adminRepository = adminRepository;
+        this.judulRepository = judulRepository;
     }
 
     @Override
@@ -40,45 +44,51 @@ public class AnggotaImpl implements AnggotaService {
     }
 
     @Override
+    public List<Anggota> getAllByJudul(Long idJudul) {
+        return anggotaRepository.findByIdJudulId(idJudul);
+    }
+
+    @Override
     public Optional<Anggota> getAnggotaById(Long id) {
         return anggotaRepository.findById(id);
     }
 
     @Override
     public AnggotaDTO tambahAnggotaDTO(Long idAdmin, AnggotaDTO anggotaDTO) {
+        // Cek apakah Admin dengan idAdmin ada
         Admin admin = adminRepository.findById(idAdmin)
                 .orElseThrow(() -> new NotFoundException("Id Admin tidak ditemukan"));
 
+        // Buat objek Anggota baru
         Anggota anggota = new Anggota();
         anggota.setNama(anggotaDTO.getNama());
         anggota.setGender(anggotaDTO.getGender());
         anggota.setTanggalLahir(anggotaDTO.getTanggalLahir());
         anggota.setAdmin(admin);
 
-        if (anggotaDTO.getIdAnggota() != null) {
-            Anggota parentAnggota = anggotaRepository.findById(anggotaDTO.getIdAnggota())
-                    .orElseThrow(() -> new NotFoundException("Id Anggota tidak ditemukan"));
-            anggota.setIdAnggota(parentAnggota);
+        // Cek apakah idJudul ada dan valid
+        if (anggotaDTO.getIdJudul() != null) {
+            Judul judul = judulRepository.findById(anggotaDTO.getIdJudul())
+                    .orElseThrow(() -> new NotFoundException("Id Judul tidak ditemukan"));
+            anggota.setIdJudul(judul);
         } else {
-            anggota.setIdAnggota(null);
+            anggota.setIdJudul(null);
         }
 
+        // Simpan Anggota ke database
         Anggota savedAnggota = anggotaRepository.save(anggota);
 
-        // Konversi ke DTO
+        // Konversi ke DTO untuk dikembalikan
         AnggotaDTO result = new AnggotaDTO();
         result.setId(savedAnggota.getId());
         result.setNama(savedAnggota.getNama());
         result.setGender(savedAnggota.getGender());
         result.setTanggalLahir(savedAnggota.getTanggalLahir());
         result.setIdAdmin(idAdmin);
-        if (savedAnggota.getIdAnggota() != null) {
-            result.setIdAnggota(savedAnggota.getIdAnggota().getId());  // Mengambil ID anggota parent
-        }
+        result.setIdJudul(savedAnggota.getIdJudul() != null ? savedAnggota.getIdJudul().getId() : null);
 
         return result;
     }
-
 
 //    @Override
 //    public void uploadFotoAnggota(Long idAdmin, Long anggotaId, MultipartFile image) throws IOException {
@@ -107,42 +117,43 @@ public class AnggotaImpl implements AnggotaService {
 
     @Override
     public AnggotaDTO editAnggotaDTO(Long id, Long idAdmin, AnggotaDTO anggotaDTO) throws IOException {
+        // Cari anggota yang akan diedit berdasarkan id
         Anggota existingAnggota = anggotaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Anggota tidak ditemukan"));
 
+        // Cek apakah Admin dengan idAdmin ada
         Admin admin = adminRepository.findById(idAdmin)
                 .orElseThrow(() -> new NotFoundException("Id Admin tidak ditemukan"));
 
+        // Update properti Anggota
         existingAnggota.setNama(anggotaDTO.getNama());
         existingAnggota.setGender(anggotaDTO.getGender());
         existingAnggota.setTanggalLahir(anggotaDTO.getTanggalLahir());
         existingAnggota.setAdmin(admin);
 
-        if (anggotaDTO.getIdAnggota() != null) {
-            Anggota parentAnggota = anggotaRepository.findById(anggotaDTO.getIdAnggota())
-                    .orElseThrow(() -> new NotFoundException("Id Anggota tidak ditemukan"));
-            existingAnggota.setIdAnggota(parentAnggota);
+        // Cek apakah idJudul ada dan valid
+        if (anggotaDTO.getIdJudul() != null) {
+            Judul judul = judulRepository.findById(anggotaDTO.getIdJudul())
+                    .orElseThrow(() -> new NotFoundException("Id Judul tidak ditemukan"));
+            existingAnggota.setIdJudul(judul);
         } else {
-            existingAnggota.setIdAnggota(null);
+            existingAnggota.setIdJudul(null);
         }
 
-        // Simpan perubahan
+        // Simpan perubahan ke database
         Anggota updatedAnggota = anggotaRepository.save(existingAnggota);
 
-        // Konversi ke DTO
+        // Konversi ke DTO untuk dikembalikan
         AnggotaDTO result = new AnggotaDTO();
         result.setId(updatedAnggota.getId());
         result.setNama(updatedAnggota.getNama());
         result.setGender(updatedAnggota.getGender());
         result.setTanggalLahir(updatedAnggota.getTanggalLahir());
         result.setIdAdmin(idAdmin);
-        if (updatedAnggota.getIdAnggota() != null) {
-            result.setIdAnggota(updatedAnggota.getIdAnggota().getId());  // Mengambil ID anggota parent
-        }
+        result.setIdJudul(updatedAnggota.getIdJudul() != null ? updatedAnggota.getIdJudul().getId() : null);
 
         return result;
     }
-
 
 
     @Override

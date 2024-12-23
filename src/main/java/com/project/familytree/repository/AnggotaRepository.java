@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface AnggotaRepository extends JpaRepository<Anggota, Long> {
     List<Anggota> findByAdminId(Long idAdmin);
+
+    List<Anggota> findByIdJudulId(Long idJudul);
 }

@@ -14,6 +14,8 @@ public interface AnggotaService {
 
     List<Anggota> getAllByAdmin(Long idAdmin);
 
+    List<Anggota> getAllByJudul(Long idJudul);
+
     Optional<Anggota> getAnggotaById(Long id);
 
     AnggotaDTO tambahAnggotaDTO(Long idAdmin, AnggotaDTO anggotaDTO);
