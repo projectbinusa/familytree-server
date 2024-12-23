@@ -35,6 +35,12 @@ public class AnggotaController {
         return ResponseEntity.ok(anggotaList);
     }
 
+    @GetMapping("/anggota/all-by-judul/{idJudul}")
+    public ResponseEntity<List<Anggota>> getAllAnggotaByJudul(@PathVariable Long idJudul) {
+        List<Anggota> anggotaList = anggotaService.getAllByJudul(idJudul);
+        return ResponseEntity.ok(anggotaList);
+    }
+
     @GetMapping("/anggota/getById/{id}")
     public ResponseEntity<AnggotaDTO> getAnggotaById(@PathVariable Long id) {
         Optional<Anggota> anggota = anggotaService.getAnggotaById(id);
@@ -44,7 +50,7 @@ public class AnggotaController {
             anggotaDTO.setNama(anggotaEntity.getNama());
             anggotaDTO.setGender(anggotaEntity.getGender());
             anggotaDTO.setTanggalLahir(anggotaEntity.getTanggalLahir());
-            anggotaDTO.setIdAnggota(anggotaEntity.getIdAnggota() != null ? anggotaEntity.getIdAnggota().getId() : null);
+            anggotaDTO.setIdJudul(anggotaEntity.getIdJudul() != null ? anggotaEntity.getIdJudul().getId() : null); // Mengambil idJudul
             anggotaDTO.setIdAdmin(anggotaEntity.getAdmin().getId());
             return ResponseEntity.ok(anggotaDTO);
         }).orElseGet(() -> ResponseEntity.notFound().build());
@@ -55,6 +61,10 @@ public class AnggotaController {
     public ResponseEntity<AnggotaDTO> tambahAnggota(
             @PathVariable Long idAdmin,
             @RequestBody AnggotaDTO anggotaDTO) {
+
+        if (anggotaDTO.getIdJudul() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
 
         AnggotaDTO savedAnggota = anggotaService.tambahAnggotaDTO(idAdmin, anggotaDTO);
         return ResponseEntity.ok(savedAnggota);
@@ -72,14 +82,22 @@ public class AnggotaController {
 //        return ResponseEntity.ok().build();
 //    }
 
-    @PutMapping(value = "/anggota/editById/{id}")
+    @PutMapping("/anggota/editById/{id}")
     public ResponseEntity<AnggotaDTO> editAnggota(
             @PathVariable Long id,
             @RequestParam Long idAdmin,
-            @RequestPart(value = "anggota") AnggotaDTO anggotaDTO) throws IOException {
+            @RequestBody AnggotaDTO anggotaDTO) {
 
-        AnggotaDTO updatedAnggota = anggotaService.editAnggotaDTO(id, idAdmin, anggotaDTO);
-        return ResponseEntity.ok(updatedAnggota);
+        if (anggotaDTO.getIdJudul() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        try {
+            AnggotaDTO updatedAnggota = anggotaService.editAnggotaDTO(id, idAdmin, anggotaDTO);
+            return ResponseEntity.ok(updatedAnggota);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 

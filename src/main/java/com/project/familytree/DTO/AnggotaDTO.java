@@ -6,7 +6,7 @@ public class AnggotaDTO {
     private String gender;
     private String tanggalLahir;
     private String fotoAnggota;
-    private Long idAnggota;
+    private Long idJudul;
     private Long idAdmin;
 
     public Long getId() {
@@ -49,12 +49,12 @@ public class AnggotaDTO {
         this.fotoAnggota = fotoAnggota;
     }
 
-    public Long getIdAnggota() {
-        return idAnggota;
+    public Long getIdJudul() {
+        return idJudul;
     }
 
-    public void setIdAnggota(Long idAnggota) {
-        this.idAnggota = idAnggota;
+    public void setIdJudul(Long idJudul) {
+        this.idJudul = idJudul;
     }
 
     public Long getIdAdmin() {

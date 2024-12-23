@@ -24,8 +24,8 @@ public class Anggota {
     private String fotoAnggota;
 
     @ManyToOne
-    @JoinColumn(name = "id_anggota", nullable = true)
-    private Anggota idAnggota;
+    @JoinColumn(name = "id_judul", nullable = false)
+    private Judul idJudul;
 
     @ManyToOne
     @JoinColumn(name = "id_admin", nullable = false)
@@ -34,13 +34,13 @@ public class Anggota {
     public Anggota() {
     }
 
-    public Anggota(Long id, String nama, String gender, String tanggalLahir, String fotoAnggota, Anggota idAnggota, Admin admin) {
+    public Anggota(Long id, String nama, String gender, String tanggalLahir, String fotoAnggota, Judul idJudul, Admin admin) {
         this.id = id;
         this.nama = nama;
         this.gender = gender;
         this.tanggalLahir = tanggalLahir;
         this.fotoAnggota = fotoAnggota;
-        this.idAnggota = idAnggota;
+        this.idJudul = idJudul;
         this.admin = admin;
     }
 
@@ -69,12 +69,12 @@ public class Anggota {
         this.gender = gender;
     }
 
-    public Anggota getIdAnggota() {
-        return idAnggota;
+    public Judul getIdJudul() {
+        return idJudul;
     }
 
-    public void setIdAnggota(Anggota idAnggota) {
-        this.idAnggota = idAnggota;
+    public void setIdJudul(Judul idJudul) {
+        this.idJudul = idJudul;
     }
 
     public String getTanggalLahir() {
