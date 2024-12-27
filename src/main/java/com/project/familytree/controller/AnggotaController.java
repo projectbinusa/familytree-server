@@ -36,9 +36,14 @@ public class AnggotaController {
     }
 
     @GetMapping("/anggota/all-by-judul/{idJudul}")
-    public ResponseEntity<List<Anggota>> getAllAnggotaByJudul(@PathVariable Long idJudul) {
-        List<Anggota> anggotaList = anggotaService.getAllByJudul(idJudul);
-        return ResponseEntity.ok(anggotaList);
+    public ResponseEntity<?> getAllAnggotaByJudul(@PathVariable String idJudul) {
+        try {
+            Long judulId = Long.parseLong(idJudul);
+            List<Anggota> anggotaList = anggotaService.getAllByJudul(judulId);
+            return ResponseEntity.ok(anggotaList);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("Invalid ID format");
+        }
     }
 
     @GetMapping("/anggota/getById/{id}")
