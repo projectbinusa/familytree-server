@@ -4,6 +4,7 @@ import com.project.familytree.DTO.AnggotaDTO;
 import com.project.familytree.exception.NotFoundException;
 import com.project.familytree.model.Anggota;
 import com.project.familytree.service.AnggotaService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -88,22 +89,26 @@ public class AnggotaController {
 //    }
 
     @PutMapping("/anggota/editById/{id}")
-    public ResponseEntity<AnggotaDTO> editAnggota(
+    public ResponseEntity<?> editAnggota(
             @PathVariable Long id,
             @RequestParam Long idAdmin,
             @RequestBody AnggotaDTO anggotaDTO) {
 
-        if (anggotaDTO.getIdJudul() == null) {
-            return ResponseEntity.badRequest().body(null);
+        // Validasi input
+        if (anggotaDTO == null || anggotaDTO.getIdJudul() == null) {
+            return ResponseEntity.badRequest().body("IdJudul tidak boleh null.");
         }
 
         try {
             AnggotaDTO updatedAnggota = anggotaService.editAnggotaDTO(id, idAdmin, anggotaDTO);
             return ResponseEntity.ok(updatedAnggota);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Terjadi kesalahan saat mengupdate anggota.");
         }
     }
+
 
 
     @DeleteMapping("/anggota/delete/{id}")
