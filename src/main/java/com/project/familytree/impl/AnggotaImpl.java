@@ -117,21 +117,21 @@ public class AnggotaImpl implements AnggotaService {
 
     @Override
     public AnggotaDTO editAnggotaDTO(Long id, Long idAdmin, AnggotaDTO anggotaDTO) throws IOException {
-        // Cari anggota yang akan diedit berdasarkan id
+        // Cek apakah anggota dengan id tersedia
         Anggota existingAnggota = anggotaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Anggota tidak ditemukan"));
 
-        // Cek apakah Admin dengan idAdmin ada
+        // Cek apakah admin dengan idAdmin tersedia
         Admin admin = adminRepository.findById(idAdmin)
                 .orElseThrow(() -> new NotFoundException("Id Admin tidak ditemukan"));
 
-        // Update properti Anggota
+        // Update properti anggota
         existingAnggota.setNama(anggotaDTO.getNama());
         existingAnggota.setGender(anggotaDTO.getGender());
         existingAnggota.setTanggalLahir(anggotaDTO.getTanggalLahir());
         existingAnggota.setAdmin(admin);
 
-        // Cek apakah idJudul ada dan valid
+        // Cek idJudul
         if (anggotaDTO.getIdJudul() != null) {
             Judul judul = judulRepository.findById(anggotaDTO.getIdJudul())
                     .orElseThrow(() -> new NotFoundException("Id Judul tidak ditemukan"));
@@ -140,20 +140,25 @@ public class AnggotaImpl implements AnggotaService {
             existingAnggota.setIdJudul(null);
         }
 
-        // Simpan perubahan ke database
+        // Simpan perubahan
         Anggota updatedAnggota = anggotaRepository.save(existingAnggota);
 
-        // Konversi ke DTO untuk dikembalikan
-        AnggotaDTO result = new AnggotaDTO();
-        result.setId(updatedAnggota.getId());
-        result.setNama(updatedAnggota.getNama());
-        result.setGender(updatedAnggota.getGender());
-        result.setTanggalLahir(updatedAnggota.getTanggalLahir());
-        result.setIdAdmin(idAdmin);
-        result.setIdJudul(updatedAnggota.getIdJudul() != null ? updatedAnggota.getIdJudul().getId() : null);
+        // Konversi entity ke DTO
+        return mapToDTO(updatedAnggota, idAdmin);
+    }
 
+    // Fungsi untuk konversi entity ke DTO
+    private AnggotaDTO mapToDTO(Anggota anggota, Long idAdmin) {
+        AnggotaDTO result = new AnggotaDTO();
+        result.setId(anggota.getId());
+        result.setNama(anggota.getNama());
+        result.setGender(anggota.getGender());
+        result.setTanggalLahir(anggota.getTanggalLahir());
+        result.setIdAdmin(idAdmin);
+        result.setIdJudul(anggota.getIdJudul() != null ? anggota.getIdJudul().getId() : null);
         return result;
     }
+
 
 
     @Override
